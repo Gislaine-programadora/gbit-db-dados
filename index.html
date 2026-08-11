@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>gbit-db-dados — Seu banco de dados cabe numa pasta</title>
+<meta name="description" content="gbit-db-dados: banco de dados NoSQL local, criação própria, zero dependências. Alternativa moderna ao PostgreSQL, MySQL e MongoDB para rodar só com Node.js.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper:        #F2E9D8;
+  --paper-deep:   #E4D3AE;
+  --paper-white:  #FAF5E9;
+  --ink:          #21261F;
+  --ink-soft:     #565C4E;
+  --ink-faint:    #8B8975;
+  --stamp-red:    #B23A2E;
+  --stamp-green:  #3B6E4F;
+  --line:         rgba(33, 38, 31, 0.16);
+  --line-strong:  rgba(33, 38, 31, 0.3);
+  --shadow-card:  0 8px 20px -6px rgba(33, 38, 31, 0.25);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  background-image:
+    radial-gradient(circle at 15% 8%, rgba(178,58,46,0.05), transparent 40%),
+    radial-gradient(circle at 85% 92%, rgba(59,110,79,0.06), transparent 40%);
+  color: var(--ink);
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+  html { scroll-behavior: auto; }
+}
+
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 32px; }
+
+a { color: inherit; }
+
+.mono {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+::selection { background: var(--stamp-red); color: var(--paper-white); }
+
+:focus-visible {
+  outline: 2px solid var(--stamp-red);
+  outline-offset: 3px;
+}
+
+/* ═══════════════════════════════════════
+   FOLDER-TAB NAV
+   ═══════════════════════════════════════ */
+.nav-shell {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.nav-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 32px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.wordmark {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 19px;
+  letter-spacing: -0.2px;
+  padding: 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.wordmark .dot { color: var(--stamp-red); }
+
+.tabs {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+
+.tab {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  padding: 10px 16px 9px;
+  border: 1px solid var(--line-strong);
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  background: var(--paper-deep);
+  transform: translateY(1px);
+  transition: transform 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.tab:hover { color: var(--ink); transform: translateY(-2px); }
+
+.tab.active {
+  background: var(--paper-white);
+  color: var(--stamp-red);
+  transform: translateY(0);
+  border-bottom: 1px solid var(--paper-white);
+}
+
+/* ═══════════════════════════════════════
+   HERO
+   ═══════════════════════════════════════
+*/
+.hero {
+  padding: 88px 0 60px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--stamp-red);
+  border: 1px solid var(--stamp-red);
+  padding: 5px 12px 5px 10px;
+  border-radius: 3px;
+  margin-bottom: 22px;
+  background: rgba(178,58,46,0.05);
+}
+
+.eyebrow::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--stamp-red);
+}
+
+.hero h1 {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: clamp(38px, 5vw, 58px);
+  line-height: 1.04;
+  letter-spacing: -1.3px;
+  color: var(--ink);
+  margin-bottom: 22px;
+}
+
+.hero h1 em {
+  font-style: italic;
+  font-weight: 500;
+  color: var(--stamp-red);
+}
+
+.hero-sub {
+  font-size: 18px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  max-width: 46ch;
+  margin-bottom: 34px;
+}
+
+.hero-sub strong { color: var(--ink); font-weight: 600; }
+
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.btn {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  padding: 13px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+  border: 1.5px solid var(--ink);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.btn-install {
+  background: var(--ink);
+  color: var(--paper-white);
+}
+.btn-install:hover { transform: translateY(-2px); box-shadow: 0 6px 14px -4px rgba(33,38,31,0.4); }
+.btn-install:active { transform: translateY(0); }
+
+.btn-github {
+  background: transparent;
+  color: var(--ink);
+}
+.btn-github:hover { background: var(--paper-white); transform: translateY(-2px); box-shadow: var(--shadow-card); }
+
+.btn-install .copied-flag {
+  font-size: 10px;
+  color: var(--stamp-green);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.btn-install.copied .copied-flag { opacity: 1; }
+.btn-install.copied .cmd-text { opacity: 0.5; }
+
+.trust-line {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11.5px;
+  color: var(--ink-faint);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.trust-line .sep { color: var(--line-strong); }
+
+/* ── hero card fan ── */
+.card-drawer {
+  position: relative;
+  height: 380px;
+}
+
+.index-card {
+  position: absolute;
+  width: 240px;
+  background: var(--paper-white);
+  border: 1px solid var(--line-strong);
+  border-radius: 3px;
+  box-shadow: var(--shadow-card);
+  padding: 16px 18px 18px;
+  opacity: 0;
+  animation: cardIn 0.7s cubic-bezier(.2,.7,.3,1) forwards;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(24px) rotate(var(--rot)) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) rotate(var(--rot)) scale(1); }
+}
+
+.index-card::before {
+  content: '';
+  position: absolute;
+  top: 10px; left: 50%;
+  width: 20px; height: 6px;
+  margin-left: -10px;
+  border-radius: 3px;
+  background: repeating-linear-gradient(90deg, var(--line-strong) 0 2px, transparent 2px 4px);
+}
+
+.card-1 { --rot: -7deg; top: 8px; left: 4px; z-index: 1; animation-delay: 0.05s; }
+.card-2 { --rot: 3deg; top: 30px; left: 130px; z-index: 2; animation-delay: 0.18s; }
+.card-3 { --rot: -2deg; top: 150px; left: 40px; z-index: 3; animation-delay: 0.32s; }
+
+.card-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  display: block;
+  border-bottom: 1px dashed var(--line-strong);
+  padding-bottom: 8px;
+}
+
+.card-json {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--ink-soft);
+  white-space: pre;
+}
+
+.card-json .k { color: var(--stamp-green); }
+.card-json .v { color: var(--ink); }
+
+.stamp-seal {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  width: 66px; height: 66px;
+  border: 2px solid var(--stamp-red);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(-14deg);
+  opacity: 0.85;
+}
+
+.stamp-seal span {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--stamp-red);
+  text-align: center;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+/* ═══════════════════════════════════════
+   SECTION SHELL
+   ═══════════════════════════════════════ */
+.section {
+  padding: 76px 0;
+  border-top: 1px solid var(--line);
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  margin-bottom: 44px;
+  flex-wrap: wrap;
+}
+
+.section-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--stamp-red);
+  margin-bottom: 10px;
+}
+
+.section h2 {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: clamp(28px, 3.4vw, 38px);
+  letter-spacing: -0.8px;
+  line-height: 1.12;
+  max-width: 20ch;
+}
+
+.section-note {
+  font-size: 15px;
+  color: var(--ink-soft);
+  max-width: 32ch;
+  text-align: right;
+}
+
+@media (max-width: 720px) {
+  .section-note { text-align: left; max-width: 100%; }
+}
+
+/* ═══════════════════════════════════════
+   FICHAS (feature cards)
+   ═══════════════════════════════════════ */
+.fichas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.ficha {
+  background: var(--paper-white);
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  padding: 22px 22px 24px;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ficha:hover {
+  transform: rotate(-0.6deg) translateY(-3px);
+  box-shadow: var(--shadow-card);
+}
+
+.ficha-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: var(--paper-white);
+  background: var(--ink);
+  padding: 3px 8px;
+  border-radius: 2px;
+  display: inline-block;
+  margin-bottom: 14px;
+}
+
+.ficha h3 {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 18.5px;
+  letter-spacing: -0.2px;
+  margin-bottom: 8px;
+  color: var(--ink);
+}
+
+.ficha p {
+  font-size: 14px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.ficha .punch {
+  position: absolute;
+  top: 18px; right: 18px;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+}
+
+/* ═══════════════════════════════════════
+   TERMINAL / RECEIPT BLOCK
+   ═══════════════════════════════════════ */
+.terminal {
+  background: var(--ink);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.terminal-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.terminal-dot { width: 9px; height: 9px; border-radius: 50%; background: rgba(250,245,233,0.25); }
+
+.terminal-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: rgba(250,245,233,0.4);
+  margin-left: 6px;
+}
+
+.terminal-body {
+  padding: 24px 26px 28px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13.5px;
+  line-height: 2.05;
+}
+
+.terminal-line { color: rgba(250,245,233,0.92); }
+.terminal-prompt { color: var(--stamp-green); margin-right: 10px; }
+.terminal-comment { color: rgba(250,245,233,0.38); }
+
+/* ═══════════════════════════════════════
+   CODE PANEL (punch-card style)
+   ═══════════════════════════════════════ */
+.code-layout {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.code-copy h3 {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 24px;
+  margin-bottom: 14px;
+  letter-spacing: -0.4px;
+}
+
+.code-copy p { color: var(--ink-soft); font-size: 15px; margin-bottom: 16px; }
+
+.code-copy ul { list-style: none; }
+.code-copy li {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  padding: 7px 0;
+  border-top: 1px dashed var(--line-strong);
+  display: flex;
+  gap: 10px;
+}
+.code-copy li:first-child { border-top: none; }
+.code-copy li .op { color: var(--stamp-red); font-weight: 700; min-width: 16px; }
+
+.punch-panel {
+  background: var(--paper-white);
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  box-shadow: var(--shadow-card);
+  position: relative;
+  clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%);
+}
+
+.punch-panel::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 22px; height: 22px;
+  background: var(--paper);
+  border-left: 1px solid var(--line-strong);
+  border-bottom: 1px solid var(--line-strong);
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+
+.punch-panel pre {
+  padding: 26px 24px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12.5px;
+  line-height: 1.85;
+  overflow-x: auto;
+  color: var(--ink-soft);
+}
+
+.tok-kw   { color: var(--stamp-red); }
+.tok-str  { color: var(--stamp-green); }
+.tok-fn   { color: var(--ink); font-weight: 600; }
+.tok-com  { color: var(--ink-faint); font-style: italic; }
+
+/* ═══════════════════════════════════════
+   FILE DRAWER (folder structure)
+   ═══════════════════════════════════════ */
+.drawer {
+  background: var(--paper-deep);
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  padding: 8px;
+  box-shadow: inset 0 2px 6px rgba(33,38,31,0.1);
+}
+
+.drawer-inner {
+  background: var(--paper-white);
+  border-radius: 4px;
+  padding: 36px 40px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13.5px;
+  line-height: 2.1;
+}
+
+.tree-line { color: var(--ink-soft); white-space: pre; }
+.tree-root { color: var(--ink); font-weight: 700; }
+.tree-folder { color: var(--stamp-red); font-weight: 600; }
+.tree-file { color: var(--ink-soft); }
+.tree-comment { color: var(--ink-faint); }
+
+/* ═══════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════ */
+footer {
+  border-top: 1px solid var(--line-strong);
+  padding: 48px 0 56px;
+}
+
+.footer-grid {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.footer-tag {
+  font-family: 'Fraunces', serif;
+  font-size: 17px;
+  font-style: italic;
+  color: var(--ink-soft);
+}
+
+.footer-links {
+  display: flex;
+  gap: 22px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.footer-links a {
+  text-decoration: none;
+  color: var(--ink-soft);
+  border-bottom: 1px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+.footer-links a:hover { color: var(--stamp-red); border-color: var(--stamp-red); }
+
+.mit-stamp {
+  width: 54px; height: 54px;
+  border: 2px dashed var(--stamp-green);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(8deg);
+  flex-shrink: 0;
+}
+.mit-stamp span {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--stamp-green);
+}
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════ */
+@media (max-width: 860px) {
+  .hero-grid { grid-template-columns: 1fr; }
+  .card-drawer { height: 300px; margin-top: 20px; }
+  .fichas { grid-template-columns: 1fr 1fr; }
+  .code-layout { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .wrap { padding: 0 20px; }
+  .nav-inner { padding: 0 20px; }
+  .fichas { grid-template-columns: 1fr; }
+  .hero { padding: 56px 0 40px; }
+  .section { padding: 52px 0; }
+  .drawer-inner { padding: 24px 18px; font-size: 12px; }
+  .index-card { width: 200px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<div class="nav-shell">
+  <div class="nav-inner">
+    <a class="wordmark" href="#topo">gbit<span class="dot">·</span>db<span class="dot">·</span>dados</a>
+    <nav class="tabs" id="tabNav">
+      <a class="tab active" href="#topo" data-target="topo">Início</a>
+      <a class="tab" href="#recursos" data-target="recursos">Recursos</a>
+      <a class="tab" href="#cli" data-target="cli">CLI</a>
+      <a class="tab" href="#codigo" data-target="codigo">Código</a>
+      <a class="tab" href="#estrutura" data-target="estrutura">Estrutura</a>
+      <a class="tab" href="https://github.com/gbit/gbit-db-dados" target="_blank" rel="noopener">GitHub ↗</a>
+    </nav>
+  </div>
+</div>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero" id="topo">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">Ficha nº 001 — banco de dados local</div>
+        <h1>Seu banco de dados<br>cabe numa <em>pasta.</em></h1>
+        <p class="hero-sub">
+          <strong>gbit-db-dados</strong> é um banco NoSQL de criação própria — zero dependências,
+          escrita atômica e índices reais, rodando só com Node.js. Uma alternativa moderna ao
+          <strong>PostgreSQL</strong>, <strong>MySQL</strong> ou <strong>MongoDB</strong> pra quem
+          não precisa (ou não quer) subir um servidor de banco.
+        </p>
+        <div class="cta-row">
+          <button class="btn btn-install" id="copyInstall" type="button">
+            <span class="mono cmd-text">$ npm install gbit-db-dados</span>
+            <span class="copied-flag">✓ copiado</span>
+          </button>
+          <a class="btn btn-github" href="https://github.com/gbit/gbit-db-dados" target="_blank" rel="noopener">
+            Ver código no GitHub →
+          </a>
+        </div>
+        <div class="trust-line">
+          <span>MIT license</span>
+          <span class="sep">·</span>
+          <span>0 dependências</span>
+          <span class="sep">·</span>
+          <span>Node ≥ 16</span>
+          <span class="sep">·</span>
+          <span>CLI + biblioteca</span>
+        </div>
+      </div>
+
+      <div class="card-drawer" aria-hidden="true">
+        <div class="index-card card-1">
+          <span class="card-label">collections/users.json</span>
+          <div class="card-json">{
+  <span class="k">"name"</span>: <span class="v">"Ana"</span>,
+  <span class="k">"email"</span>: <span class="v">"ana@ex.com"</span>,
+  <span class="k">"_id"</span>: <span class="v">"mskr..."</span>
+}</div>
+        </div>
+        <div class="index-card card-2">
+          <span class="card-label">index · email (único)</span>
+          <div class="card-json">ana@ex.com → id
+bia@ex.com → id
+caio@ex.com → id
+
+<span class="k">lookup</span>: O(1)</div>
+        </div>
+        <div class="index-card card-3">
+          <span class="card-label">transactions/log</span>
+          <div class="card-json">status: <span class="k">committed</span>
+coleções: 2
+rollback: <span class="v">disponível</span></div>
+          <div class="stamp-seal"><span>ESCRITA<br>ATÔMICA<br>✓</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ RECURSOS / FICHAS ═══ -->
+<section class="section" id="recursos">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="section-eyebrow">Catálogo de recursos</div>
+        <h2>Por que trocar sua infraestrutura por uma pasta</h2>
+      </div>
+      <p class="section-note">Seis fichas, seis motivos — cada uma resolve um problema real de quem só queria persistir dados sem montar infraestrutura.</p>
+    </div>
+
+    <div class="fichas">
+      <div class="ficha">
+        <span class="punch"></span>
+        <span class="ficha-tag">FICHA A</span>
+        <h3>Zero dependências</h3>
+        <p>Usa só <code class="mono">fs</code>, <code class="mono">crypto</code> e <code class="mono">path</code> — módulos nativos do Node. Nada pra instalar, nada pra quebrar numa atualização de terceiros.</p>
+      </div>
+      <div class="ficha">
+        <span class="punch"></span>
+        <span class="ficha-tag">FICHA B</span>
+        <h3>Escrita atômica</h3>
+        <p>Toda gravação vai pra um arquivo temporário e só então é renomeada. Uma queda de energia no meio da escrita não corrompe seus dados.</p>
+      </div>
+      <div class="ficha">
+        <span class="punch"></span>
+        <span class="ficha-tag">FICHA C</span>
+        <h3>Índices reais</h3>
+        <p>Campos únicos viram um <em>Map</em> em memória. Buscar por e-mail é O(1) — não uma varredura em todos os documentos da coleção.</p>
+      </div>
+      <div class="ficha">
+        <span class="punch"></span>
+        <span class="ficha-tag">FICHA D</span>
+        <h3>Schema + validação</h3>
+        <p>Tipos, campos obrigatórios, valores únicos, min/max, enum e formato de e-mail — sem precisar de mais uma biblioteca.</p>
+      </div>
+      <div class="ficha">
+        <span class="punch"></span>
+        <span class="ficha-tag">FICHA E</span>
+        <h3>Transações com rollback</h3>
+        <p>Agrupe operações em várias coleções. Se uma falhar no meio, tudo volta ao estado anterior — nenhuma escrita pela metade.</p>
+      </div>
+      <div class="ficha">
+        <span class="punch"></span>
+        <span class="ficha-tag">FICHA F</span>
+        <h3>CLI + biblioteca</h3>
+        <p>Prototipe pelo terminal ou importe com <code class="mono">require()</code> direto no seu backend. Os dois falam com o mesmo banco.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CLI ═══ -->
+<section class="section" id="cli">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="section-eyebrow">Linha de comando</div>
+        <h2>Comandos que você vai usar todo dia</h2>
+      </div>
+      <p class="section-note">Sem configuração, sem servidor pra subir antes. É instalar e rodar.</p>
+    </div>
+
+    <div class="terminal">
+      <div class="terminal-bar">
+        <span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span>
+        <span class="terminal-title">bash — gbit-db-dados</span>
+      </div>
+      <div class="terminal-body">
+        <div class="terminal-line"><span class="terminal-comment"># cria um banco de dados novo</span></div>
+        <div class="terminal-line"><span class="terminal-prompt">$</span>gbit-db-dados init ./meu-banco</div>
+        <div class="terminal-line">&nbsp;</div>
+        <div class="terminal-line"><span class="terminal-comment"># cria uma coleção e insere um documento</span></div>
+        <div class="terminal-line"><span class="terminal-prompt">$</span>gbit-db-dados create-collection users</div>
+        <div class="terminal-line"><span class="terminal-prompt">$</span>gbit-db-dados insert users '{"email":"a@a.com","name":"Ana"}'</div>
+        <div class="terminal-line">&nbsp;</div>
+        <div class="terminal-line"><span class="terminal-comment"># consulta com filtro em JSON</span></div>
+        <div class="terminal-line"><span class="terminal-prompt">$</span>gbit-db-dados find users '{"name":"Ana"}'</div>
+        <div class="terminal-line">&nbsp;</div>
+        <div class="terminal-line"><span class="terminal-comment"># estatísticas do banco inteiro</span></div>
+        <div class="terminal-line"><span class="terminal-prompt">$</span>gbit-db-dados stats</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CÓDIGO ═══ -->
+<section class="section" id="codigo">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="section-eyebrow">Como biblioteca</div>
+        <h2>Também é só código</h2>
+      </div>
+      <p class="section-note">Um <code class="mono">require()</code> e o banco está pronto — sem client de conexão, sem pool, sem string de conexão pra guardar em segredo.</p>
+    </div>
+
+    <div class="code-layout">
+      <div class="code-copy">
+        <h3>Um schema, uma coleção</h3>
+        <p>Defina tipos e regras direto na criação da coleção. Campos <code class="mono">unique</code> já viram índice automaticamente.</p>
+        <ul>
+          <li><span class="op">→</span> insert(), findById(), find()</li>
+          <li><span class="op">→</span> updateById(), deleteById()</li>
+          <li><span class="op">→</span> findByIndex() — lookup O(1)</li>
+          <li><span class="op">→</span> db.transact(() =&gt; {`{...}`})</li>
+        </ul>
+      </div>
+
+      <div class="punch-panel">
+        <pre><span class="tok-kw">const</span> gbit = <span class="tok-fn">require</span>(<span class="tok-str">'gbit-db-dados'</span>);
+
+<span class="tok-kw">const</span> db = gbit.<span class="tok-fn">open</span>(<span class="tok-str">'./meu-banco'</span>);
+
+<span class="tok-kw">const</span> users = db.<span class="tok-fn">collection</span>(<span class="tok-str">'users'</span>, {
+  name:  { type: <span class="tok-str">'string'</span>, required: <span class="tok-kw">true</span> },
+  email: { type: <span class="tok-str">'string'</span>, required: <span class="tok-kw">true</span>,
+           unique: <span class="tok-kw">true</span>, format: <span class="tok-str">'email'</span> },
+});
+
+<span class="tok-com">// grava com validação + índice automático</span>
+<span class="tok-kw">const</span> user = users.<span class="tok-fn">insert</span>({
+  name: <span class="tok-str">'Ana'</span>,
+  email: <span class="tok-str">'ana@ex.com'</span>,
+});
+
+<span class="tok-com">// busca O(1) pelo índice único</span>
+users.<span class="tok-fn">findByIndex</span>(<span class="tok-str">'email'</span>, <span class="tok-str">'ana@ex.com'</span>);
+
+<span class="tok-com">// tudo ou nada entre coleções</span>
+db.<span class="tok-fn">transact</span>(() =&gt; {
+  users.<span class="tok-fn">insert</span>({ name: <span class="tok-str">'Bia'</span>, email: <span class="tok-str">'bia@ex.com'</span> });
+});</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ESTRUTURA ═══ -->
+<section class="section" id="estrutura">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="section-eyebrow">Sem mistério</div>
+        <h2>Onde seus dados realmente ficam</h2>
+      </div>
+      <p class="section-note">Tudo em JSON legível, dentro do seu próprio projeto. Pode abrir, ler e até editar na mão se precisar.</p>
+    </div>
+
+    <div class="drawer">
+      <div class="drawer-inner">
+<div class="tree-line"><span class="tree-root">meu-banco/</span></div>
+<div class="tree-line">├── <span class="tree-file">database.json</span>        <span class="tree-comment"># metadados do banco</span></div>
+<div class="tree-line">├── <span class="tree-file">metadata.json</span>         <span class="tree-comment"># schema + índices de cada coleção</span></div>
+<div class="tree-line">├── <span class="tree-folder">collections/</span></div>
+<div class="tree-line">│   ├── <span class="tree-file">users.json</span>       <span class="tree-comment"># documentos da coleção "users"</span></div>
+<div class="tree-line">│   └── <span class="tree-file">orders.json</span></div>
+<div class="tree-line">├── <span class="tree-folder">indexes/</span></div>
+<div class="tree-line">├── <span class="tree-folder">transactions/</span>       <span class="tree-comment"># log de commits e rollbacks</span></div>
+<div class="tree-line">└── <span class="tree-folder">backups/</span>            <span class="tree-comment"># snapshots gerados por "backup"</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-tag">"Documentado. Testado. Sem surpresas."</div>
+      <div class="footer-links">
+        <a href="https://github.com/gbit/gbit-db-dados" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://www.npmjs.com/package/gbit-db-dados" target="_blank" rel="noopener">npm</a>
+        <a href="#topo">Voltar ao topo</a>
+      </div>
+      <div class="mit-stamp"><span>MIT</span></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── copiar comando de instalação ──
+const copyBtn = document.getElementById('copyInstall');
+copyBtn.addEventListener('click', () => {
+  const text = 'npm install gbit-db-dados';
+  navigator.clipboard.writeText(text).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  });
+  copyBtn.classList.add('copied');
+  setTimeout(() => copyBtn.classList.remove('copied'), 1800);
+});
+
+// ── nav de abas ativa por seção visível ──
+const tabs = Array.from(document.querySelectorAll('.tab[data-target]'));
+const sections = tabs
+  .map((t) => document.getElementById(t.dataset.target))
+  .filter(Boolean);
+
+const observer = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      const id = entry.target.id;
+      tabs.forEach((t) => t.classList.toggle('active', t.dataset.target === id));
+    });
+  },
+  { rootMargin: '-40% 0px -50% 0px', threshold: 0 }
+);
+
+sections.forEach((s) => observer.observe(s));
+</script>
+</body>
+</html>

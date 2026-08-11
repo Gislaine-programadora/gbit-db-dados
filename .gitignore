@@ -1,0 +1,13 @@
+node_modules/
+*.log
+.DS_Store
+npm-debug.log*
+
+# Bancos de dados criados durante testes locais/manuais
+/example-db/
+/tmp-*/
+/*.gbit/
+
+# Backups gerados
+templates/database/backups/*
+!templates/database/backups/.gitkeep

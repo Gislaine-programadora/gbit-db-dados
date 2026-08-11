@@ -1,0 +1,31 @@
+{
+  "name": "gbit-db-dados",
+  "version": "1.0.0",
+  "description": "Banco de dados NoSQL local, orientado a arquivos, 100% Node.js puro. Sem dependências externas, sem PostgreSQL, sem MongoDB — só o filesystem.",
+  "main": "lib/index.js",
+  "bin": {
+    "gbit-db-dados": "./bin/gbit-db-dados.js"
+  },
+  "type": "commonjs",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "start": "node bin/gbit-db-dados.js"
+  },
+  "keywords": [
+    "database",
+    "nosql",
+    "local",
+    "json",
+    "file-based",
+    "cli",
+    "embedded",
+    "zero-dependency"
+  ],
+  "author": "gbit",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
+}
