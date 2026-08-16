@@ -53,6 +53,8 @@
 
 GBIT DB Dados
 
+📦 [Pacote no NPM](https://www.npmjs.com/package/gbit-db-dados) · 💻 [Repositório no GitHub](https://github.com/Gislaine-programadora)
+
 **Banco de dados criação própria do Gbit — moderno, leve e sem dependências externas.**
 
 O `gbit-db-dados` é uma alternativa moderna a bancos como **PostgreSQL**, **MySQL** e **MongoDB**. Ele roda 100% em cima do Node.js e do sistema de arquivos local — sem precisar instalar servidor de banco, sem Docker, sem serviço externo rodando em background. Só instalar o pacote e usar.
@@ -129,6 +131,18 @@ gbit-db-dados version
 # ajuda com todos os comandos
 gbit-db-dados help
 ```
+
+
+## ⚠️ Importante: depois de criar coleções
+
+Depois de criar ou alterar coleções no **gbit-db-dados**, rode na **raiz do projeto**:
+
+```bash
+npm run build
+```
+
+Sem isso, o projeto não reconhece as coleções novas. É o único passo manual do fluxo — todo o resto sobe sozinho.
+
 
 ---
 
