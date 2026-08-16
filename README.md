@@ -1,10 +1,27 @@
+
+
 <p align="center">
   <img
     src="assets/gbit-db-dados.png"
-    alt="GBIT-DB-DADOS - Banco de Dados Nativo GBIT"
-    width="700%"
+    alt="GBIT-DB-DADOS —Banco de Dados Nativo GBIT"
+    width="700"
   />
 </p>
+
+<p align="center">
+
+  ![Version](https://img.shields.io/badge/version-1.0.0-brightgreen)
+  ![NPM](https://img.shields.io/badge/npm-package-red?logo=npm)
+  ![Node.js](https://img.shields.io/badge/Node.js-%3E%3D16-339933?logo=node.js&logoColor=white)
+  ![Backend](https://img.shields.io/badge/Backend-ready-blue)
+  ![Frontend](https://img.shields.io/badge/Frontend-compatible-purple)
+  ![Fullstack](https://img.shields.io/badge/Fullstack-ready-orange)
+  ![NoSQL](https://img.shields.io/badge/Database-NoSQL-green)
+  ![Tests](https://img.shields.io/badge/tests-20%2F20-success)
+  ![License](https://img.shields.io/badge/license-MIT-blue)
+
+</p>
+
 
 
 <svg width="720" height="150" viewBox="0 0 720 150" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="gbit-db-dados">
@@ -45,7 +62,7 @@
   <!-- tagline -->
   <text x="170" y="122" font-family="'Courier New', monospace" font-size="13" letter-spacing="1.5"
         fill="#8B8975">
-    BANCO DE DADOS LOCAL · ZERO DEPENDÊNCIAS
+  ## Integrar No Seu  Backend facil e rapido
   </text>
 </svg>
 
@@ -82,8 +99,23 @@ Feito para ser **rápido, previsível e fácil de integrar em qualquer projeto b
   <img
     src="assets/gbit-db-dados-motor.png"
     alt="GBIT-DB-DADOS — Motor validado e pronto para uso"
-    width="900"
+    width="600"
   />
+</p>
+
+<p align="center">
+
+  ![GBIT-DB-DADOS](https://img.shields.io/badge/GBIT--DB--DADOS-1.0.0-brightgreen)
+  ![NPM](https://img.shields.io/badge/npm-ready-red?logo=npm)
+  ![Node.js](https://img.shields.io/badge/Node.js-%3E%3D16-339933?logo=node.js&logoColor=white)
+  ![NoSQL](https://img.shields.io/badge/NoSQL-File--Based-green)
+  ![Backend](https://img.shields.io/badge/Backend-Compatible-blue)
+  ![Frontend](https://img.shields.io/badge/Frontend-Compatible-purple)
+  ![Fullstack](https://img.shields.io/badge/Fullstack-Compatible-orange)
+  ![Tests](https://img.shields.io/badge/Tests-20%2F20-success)
+  ![Status](https://img.shields.io/badge/Status-Validated-success)
+  ![License](https://img.shields.io/badge/License-MIT-blue)
+
 </p>
 
 
@@ -99,6 +131,10 @@ Ou, para usar a CLI globalmente:
 
 ```bash
 npm install -g gbit-db-dados
+```
+
+```bash
+npx gbit-db-dados
 ```
 
 ---
@@ -420,3 +456,6 @@ consultas com operadores, persistência entre reaberturas, transações
 ## Licença
 
 MIT
+
+## autor 
+gislainelophes@gmail.com
