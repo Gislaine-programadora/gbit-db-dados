@@ -2,7 +2,7 @@
   <img
     src="assets/gbit-db-dados.png"
     alt="GBIT-DB-DADOS - Banco de Dados Nativo GBIT"
-    width="100%"
+    width="700%"
   />
 </p>
 
@@ -78,6 +78,15 @@ Feito para ser **rápido, previsível e fácil de integrar em qualquer projeto b
 | 🖥 **CLI + biblioteca** | Use pelo terminal para prototipar rápido, ou importe direto no seu código com `require('gbit-db-dados')`. |
 | 📦 **Roda em qualquer lugar** | Backend Node.js, apps desktop (Electron), scripts, ferramentas internas — se roda Node, roda `gbit-db-dados`. |
 
+<p align="center">
+  <img
+    src="assets/gbit-db-dados-motor.png"
+    alt="GBIT-DB-DADOS — Motor validado e pronto para uso"
+    width="900"
+  />
+</p>
+
+
 ---
 
 ## 📦 Instalação
@@ -133,7 +142,7 @@ gbit-db-dados help
 ```
 
 
-## ⚠️ Importante: depois de criar coleções
+## ⚠️ Importante: depois de criar coleções  se der erros 
 
 Depois de criar ou alterar coleções no **gbit-db-dados**, rode na **raiz do projeto**:
 
@@ -145,6 +154,8 @@ Sem isso, o projeto não reconhece as coleções novas. É o único passo manual
 
 
 ---
+
+## Biblioteca do motor Gbit-db-dados 
 
 ## 🧑‍💻 Comandos rápidos (código / biblioteca)
 
@@ -217,12 +228,21 @@ meu-banco/
 
 Tudo em texto legível — você pode abrir, ler e até editar os arquivos manualmente se precisar.
 
+
+
 ---
 
 ## Licença
 
 MIT
 
+<p align="center">
+  <img
+    src="assets/gbit-db-dados-motor.png"
+    alt="GBIT-DB-DADOS — Motor validado e pronto para uso"
+    width="600"
+  />
+</p>
 
 
 # gbit-db-dados
@@ -279,7 +299,7 @@ meu-banco/
 
 ---
 
-## Uso via CLI
+## Uso via CLI para projetos externos 
 
 ```bash
 # cria um banco na pasta atual
